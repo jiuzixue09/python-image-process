@@ -1,11 +1,10 @@
-from pyecharts.faker import Faker
 from pyecharts import options as opts
 from pyecharts.charts import Pie
 
 
 def create_pie_chart(columns, data, series_name=None, title="") -> Pie:
     p = Pie()\
-        .add(series_name, [list(z) for z in zip(columns, data)], center=["55%", "50%"]) \
+        .add(series_name, [list(z) for z in zip(columns, data)], center=["55%", "60%"]) \
         .set_global_opts(title_opts=opts.TitleOpts(title=title), legend_opts=opts.LegendOpts(pos_left="25%"))\
         .set_series_opts(label_opts=opts.LabelOpts(formatter="{b}: {c}"))
 
