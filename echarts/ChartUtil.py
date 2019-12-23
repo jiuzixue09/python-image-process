@@ -1,20 +1,20 @@
 import pyecharts.options as opts
-from pyecharts.charts import Line, Page, Pie
-from pyecharts.commons.utils import JsCode
-from pyecharts.faker import Collector, Faker
+from pyecharts.charts import Line, Pie
+
+from echarts.LogProcess import LogProcess
 
 
-def line_base() -> Line:
-    c = (
-        Line(init_opts=opts.InitOpts(width="90%"))
-        .add_xaxis(Faker.choose())
-        .add_yaxis("商家A", Faker.values(),is_smooth=True)
-        .add_yaxis("商家B", Faker.values(),is_smooth=True)
-        .set_global_opts(
-            title_opts=opts.TitleOpts(title="Grid-Line", pos_top="48%"),
-            legend_opts=opts.LegendOpts(pos_top="5%"),
-        )
+def create_line_chart(xaxis, yaxis_pair, title='') -> Line:
+    c = Line(init_opts=opts.InitOpts(width="90%")).add_xaxis(xaxis)
+
+    for pair in yaxis_pair:
+        c.add_yaxis(pair[0], pair[1])
+
+    c.set_global_opts(
+        title_opts=opts.TitleOpts(title=title, pos_top="48%"),
+        legend_opts=opts.LegendOpts(pos_top="5%"),
     )
+
     return c
 
 
