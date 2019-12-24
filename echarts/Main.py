@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, render_template, request
 from pyecharts.charts import Page
 
@@ -9,7 +11,18 @@ app = Flask(__name__)
 
 @app.route('/statistics/<name>')
 def statistics(name):
-    lp = LogProcess()
+    html = "templates/{name}.html"
+
+    if not os.path.exists(html):
+        html_create(name)
+
+    return render_template("{name}.html".format(name=name))
+
+
+def html_create(name):
+    html = "templates/{name}.html"
+
+    lp = LogProcess('logs/{name}.log'.format(name=name))
     stats = lp.stats
     columns = ['responseSuccessCount',
                'responseErrorCount',
@@ -26,7 +39,7 @@ def statistics(name):
 
     data2 = [list((x, stats[x])) for x in columns]
 
-    pie_chart = create_pie_chart(data, data2, title="crawler statistic")
+    pie_chart = create_pie_chart(data, data2, title="统计图")
 
     raw = lp.raw
 
@@ -50,8 +63,8 @@ def statistics(name):
     page.add(
         pie_chart, line_chart
     )
-    page.render("templates/index.html")
-    return render_template("index.html")
+
+    page.render(html.format(name=name))
 
 
 @app.route('/upload', methods=['GET', 'POST'])

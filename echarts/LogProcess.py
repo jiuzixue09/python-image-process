@@ -4,7 +4,7 @@ import json
 
 class LogProcess:
 
-    def __init__(self, log_file='logs/stats.log'):
+    def __init__(self, log_file='logs/unsplash.log'):
         ds = []
         with open(log_file, "r") as f:
             for line in f:

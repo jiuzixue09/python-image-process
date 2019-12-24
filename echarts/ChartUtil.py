@@ -13,6 +13,7 @@ def create_line_chart(xaxis, yaxis_pair, title='') -> Line:
     c.set_global_opts(
         title_opts=opts.TitleOpts(title=title, pos_top="48%"),
         legend_opts=opts.LegendOpts(pos_top="5%"),
+        datazoom_opts=[opts.DataZoomOpts()]
     )
 
     return c
@@ -28,7 +29,7 @@ def create_pie_chart(*data_pair, series_name=None, title="") -> Pie:
         p.add(series_name, data_pair[0], radius=[0, 300])
 
     p.set_global_opts(title_opts=opts.TitleOpts(title=title),
-                      legend_opts=opts.LegendOpts(pos_left="15%", orient="vertical")) \
+                      legend_opts=opts.LegendOpts(pos_left="5%", orient="vertical")) \
         .set_series_opts(label_opts=opts.LabelOpts(formatter="{b}: {c}"))
 
     return p
