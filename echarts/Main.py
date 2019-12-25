@@ -4,7 +4,8 @@ from flask import Flask, render_template, request
 from pyecharts.charts import Page
 
 from echarts.ChartUtil import create_pie_chart, create_line_chart
-from echarts.LogProcess import LogProcess
+from echarts.LogParse import LogParse
+from echarts.LogSqlService import fetch, statis
 
 app = Flask(__name__)
 
@@ -22,40 +23,38 @@ def statistics(name):
 def html_create(name):
     html = "templates/{name}.html"
 
-    lp = LogProcess('logs/{name}.log'.format(name=name))
-    stats = lp.stats
-    columns = ['responseSuccessCount',
-               'responseErrorCount',
-               'requestRedirectCount',
-               'pageLoadTimeoutCount',
-               'nonHtmlResponseCount',
-               'networkErrorCount']
-    data = [list((x, stats[x])) for x in columns]
+    rows = fetch()
+    ss = statis(rows)
 
-    columns = ['filteredDuplicateItemCount',
-               'parseErrorCount',
-               'parseItemCount',
-               ]
+    data = [list(('response_success_count', ss.response_success_count)),
+            list(('response_error_count', ss.response_error_count)),
+            list(('request_redirect_count', ss.request_redirect_count)),
+            list(('page_load_timeout_count', ss.page_load_timeout_count)),
+            list(('non_html_response_count', ss.non_html_response_count)),
+            list(('network_error_count', ss.network_error_count))]
 
-    data2 = [list((x, stats[x])) for x in columns]
+    data2 = [list(('filtered_item_count', ss.filtered_item_count)),
+             list(('filtered_duplicate_item_count', ss.filtered_duplicate_item_count)),
+             list(('parse_item_count', ss.parse_item_count)), list(('parse_error_count', ss.parse_error_count))]
 
     pie_chart = create_pie_chart(data, data2, title="统计图")
 
-    raw = lp.raw
-
+    rows = fetch()
     xaxis = []
     yaxis_pair = []
 
-    duplicate_item, parse_error, parse_item_count = [], [], []
-    for r in raw:
-        xaxis.append(r['time'])
-        duplicate_item.append(r['filteredDuplicateItemCount'])
-        parse_error.append(r['parseErrorCount'])
-        parse_item_count.append(r['parseItemCount'])
+    duplicate_item, parse_error, parse_item_count,filtered_item_count = [], [], [], []
+    for r in rows:
+        xaxis.append(r.date_time)
+        duplicate_item.append(r.filtered_duplicate_item_count)
+        parse_error.append(r.filtered_item_count)
+        parse_item_count.append(r.parse_item_count)
+        filtered_item_count.append(r.filtered_item_count)
 
-    yaxis_pair.append(('filteredDuplicateItemCount', duplicate_item))
-    yaxis_pair.append(('parseErrorCount', parse_error))
-    yaxis_pair.append(('parseItemCount', parse_item_count))
+    yaxis_pair.append(('filtered_duplicate_item_count', duplicate_item))
+    yaxis_pair.append(('parse_error_count', parse_error))
+    yaxis_pair.append(('parse_item_count', parse_item_count))
+    yaxis_pair.append(('filtered_item_count', filtered_item_count))
 
     line_chart = create_line_chart(xaxis, yaxis_pair, title='时序图')
 
@@ -67,11 +66,13 @@ def html_create(name):
     page.render(html.format(name=name))
 
 
-@app.route('/upload', methods=['GET', 'POST'])
-def upload_file():
+@app.route('/upload/<name>', methods=['GET', 'POST'])
+def upload_file(name: str):
     if request.method == 'POST':
-        f = request.files['the_file']
-        f.save('')
+        f = request.files['file']
+        f.save('logs/{name}.log'.format(name=name))
+        return {"status": 1}
+    return {"status": 0}
 
 
 if __name__ == "__main__":

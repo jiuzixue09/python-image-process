@@ -1,7 +1,7 @@
 import pyecharts.options as opts
 from pyecharts.charts import Line, Pie
 
-from echarts.LogProcess import LogProcess
+from echarts.LogParse import LogParse
 
 
 def create_line_chart(xaxis, yaxis_pair, title='') -> Line:
