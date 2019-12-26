@@ -56,11 +56,29 @@ def html_create(name):
     yaxis_pair.append(('parse_item_count', parse_item_count))
     yaxis_pair.append(('filtered_item_count', filtered_item_count))
 
-    line_chart = create_bar_chart(xaxis, yaxis_pair, title='board_id')
+    bar_chart = create_bar_chart(xaxis, yaxis_pair, title='board 统计图')
+
+    xaxis, yaxis_pair = set(), []
+    crawl_rate = []
+
+    index = -1
+    for r in rows:
+        t = str(r.date_time)[:-3]
+        if t in xaxis:
+            crawl_rate[index] += r.crawl_rate
+        else:
+            crawl_rate.append(r.crawl_rate)
+            index += 1
+
+        xaxis.add(t)
+
+    yaxis_pair.append(('crawl_rate', crawl_rate))
+
+    line_chart = create_line_chart(xaxis, yaxis_pair, title='时序图')
 
     page = Page(layout=Page.SimplePageLayout)
     page.add(
-        pie_chart, line_chart
+        pie_chart, bar_chart, line_chart
     )
 
     page.render(html.format(name=name))
