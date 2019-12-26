@@ -14,5 +14,6 @@ CREATE TABLE stats(
     parse_error_count INTEGER NOT NULL,
     parse_item_count INTEGER NOT NULL,
     date_time DATE NOT NULL,
+    create_date_time DATE NOT NULL,
     data_type TEXT NOT NULL
 );

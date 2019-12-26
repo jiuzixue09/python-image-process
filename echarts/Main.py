@@ -3,7 +3,7 @@ import os
 from flask import Flask, render_template, request
 from pyecharts.charts import Page
 
-from echarts.ChartUtil import create_pie_chart, create_line_chart
+from echarts.ChartUtil import create_pie_chart, create_line_chart, create_bar_chart
 from echarts.LogParse import LogParse
 from echarts.LogSqlService import fetch, statis
 
@@ -56,7 +56,7 @@ def html_create(name):
     yaxis_pair.append(('parse_item_count', parse_item_count))
     yaxis_pair.append(('filtered_item_count', filtered_item_count))
 
-    line_chart = create_line_chart(xaxis, yaxis_pair, title='board_id')
+    line_chart = create_bar_chart(xaxis, yaxis_pair, title='board_id')
 
     page = Page(layout=Page.SimplePageLayout)
     page.add(
