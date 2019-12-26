@@ -45,7 +45,7 @@ def html_create(name):
 
     duplicate_item, parse_error, parse_item_count,filtered_item_count = [], [], [], []
     for r in rows:
-        xaxis.append(r.date_time)
+        xaxis.append(str(r.board_id))
         duplicate_item.append(r.filtered_duplicate_item_count)
         parse_error.append(r.filtered_item_count)
         parse_item_count.append(r.parse_item_count)
@@ -56,7 +56,7 @@ def html_create(name):
     yaxis_pair.append(('parse_item_count', parse_item_count))
     yaxis_pair.append(('filtered_item_count', filtered_item_count))
 
-    line_chart = create_line_chart(xaxis, yaxis_pair, title='时序图')
+    line_chart = create_line_chart(xaxis, yaxis_pair, title='board_id')
 
     page = Page(layout=Page.SimplePageLayout)
     page.add(

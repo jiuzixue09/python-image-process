@@ -1,9 +1,4 @@
 import sqlite3
-from collections import Iterable
-from datetime import date, datetime
-from sqlite3 import Cursor
-
-from echarts.LogParse import LogParse
 
 
 class Sqlite3Template:
