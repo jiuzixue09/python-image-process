@@ -67,7 +67,7 @@ def html_create(name):
         if t in xaxis:
             crawl_rate[index] += r.crawl_rate
         else:
-            crawl_rate.append(r.crawl_rate)
+            crawl_rate.append(round(r.crawl_rate, 2))
             index += 1
 
         xaxis.add(t)
