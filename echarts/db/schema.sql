@@ -1,8 +1,7 @@
 DROP TABLE IF EXISTS stats;
 CREATE TABLE stats(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    log_id INTEGER UNIQUE NOT NULL,
-    board_id INTEGER NOT NULL,
+    board_id INTEGER UNIQUE NOT NULL,
     crawl_rate FLOAT NOT NULL,
     response_success_count INTEGER NOT NULL,
     response_error_count INTEGER NOT NULL,
