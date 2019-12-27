@@ -17,7 +17,7 @@ class LogParse:
                 j['time'] = time.group(1)
                 board_id = re.search('board_id\\s*=\\s*([\\d]+)', line)
                 j['board_id'] = int(board_id.group(1))
-                j['data_type'] = log_file.split('.log')[0]
+                j['data_type'] = log_file.split('/')[-1].split('.log')[0]
                 data.append(j)
 
         self.data = data

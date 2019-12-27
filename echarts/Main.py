@@ -23,7 +23,7 @@ def statistics(name):
 def html_create(name):
     html = "templates/{name}.html"
 
-    rows = fetch()
+    rows = fetch(name)
     ss = statis(rows)
 
     data = [list(('response_success_count', ss.response_success_count)),
@@ -39,7 +39,6 @@ def html_create(name):
 
     pie_chart = create_pie_chart(data, data2, title="统计图")
 
-    rows = fetch()
     xaxis = []
     yaxis_pair = []
 
@@ -47,7 +46,7 @@ def html_create(name):
     for r in rows:
         xaxis.append(str(r.board_id))
         duplicate_item.append(r.filtered_duplicate_item_count)
-        parse_error.append(r.filtered_item_count)
+        parse_error.append(r.parse_error_count)
         parse_item_count.append(r.parse_item_count)
         filtered_item_count.append(r.filtered_item_count)
 
@@ -58,7 +57,7 @@ def html_create(name):
 
     bar_chart = create_bar_chart(xaxis, yaxis_pair, title='board 统计图')
 
-    xaxis, yaxis_pair = set(), []
+    xaxis, yaxis_pair = [], []
     crawl_rate = []
 
     index = -1
@@ -67,11 +66,11 @@ def html_create(name):
         if t in xaxis:
             crawl_rate[index] += r.crawl_rate
         else:
-            crawl_rate.append(round(r.crawl_rate, 2))
+            crawl_rate.append(r.crawl_rate)
             index += 1
 
-        xaxis.add(t)
-
+        xaxis.append(t)
+    crawl_rate = [round(x, 2) for x in crawl_rate]
     yaxis_pair.append(('crawl_rate', crawl_rate))
 
     line_chart = create_line_chart(xaxis, yaxis_pair, title='时序图')

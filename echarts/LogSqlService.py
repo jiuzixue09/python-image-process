@@ -8,7 +8,7 @@ from echarts.Sqlite3Template import Sqlite3Template
 
 logging.basicConfig(filename='logs/echarts.log', level=logging.DEBUG)
 
-Stats = namedtuple('Stats', 'id log_id board_id crawl_rate response_success_count response_error_count '
+Stats = namedtuple('Stats', 'id board_id crawl_rate response_success_count response_error_count '
                             'request_redirect_count page_load_timeout_count non_html_response_count '
                             'network_error_count filtered_duplicate_item_count filtered_item_count parse_error_count '
                             'parse_item_count date_time create_date_time data_type')
@@ -16,17 +16,16 @@ Stats = namedtuple('Stats', 'id log_id board_id crawl_rate response_success_coun
 
 def insert(rows):
     db = Sqlite3Template('db/log.db')
-    sql = """insert into stats(log_id,board_id,crawl_rate,response_success_count,response_error_count,request_redirect_count, 
+    sql = """insert into stats(board_id,crawl_rate,response_success_count,response_error_count,request_redirect_count, 
     page_load_timeout_count,non_html_response_count,network_error_count,filtered_duplicate_item_count, 
-    filtered_item_count,parse_error_count,parse_item_count,date_time,create_date_time,data_type) values (?,?,?,?,?,?,
+    filtered_item_count,parse_error_count,parse_item_count,date_time,create_date_time,data_type) values (?,?,?,?,?,
     ?,?,?,?,?,?,?,?,?,?) """
 
     for data in rows:
         d = datetime.strptime(data['time'], '%Y-%m-%d %H:%M:%S')
-        log_id = int(d.timestamp())
 
         try:
-            db.insert_data(sql, log_id, data['board_id'], data['crawlRate'], data['responseSuccessCount'],
+            db.insert_data(sql, data['board_id'], data['crawlRate'], data['responseSuccessCount'],
                            data['responseErrorCount'],
                            data['requestRedirectCount'], data['pageLoadTimeoutCount'], data['nonHtmlResponseCount'],
                            data['networkErrorCount'], data['filteredDuplicateItemCount'], data['filteredItemCount'],
@@ -37,11 +36,11 @@ def insert(rows):
     db.close_db()
 
 
-def fetch() -> List[Stats]:
+def fetch(data_type) -> List[Stats]:
     db = Sqlite3Template('db/log.db')
-    log_id = int(datetime.now().replace(minute=0, hour=0, second=0, microsecond=0).timestamp())
+    # log_id = int(datetime.now().replace(minute=0, hour=0, second=0, microsecond=0).timestamp())
 
-    rows = db.find_where('select * from stats where log_id > ?', 0)
+    rows = db.find_where('select * from stats where data_type = ?', data_type)
     db.close_db()
     results = [Stats(*row) for row in rows]
 
@@ -60,6 +59,6 @@ def statis(rs: List[Stats]):
 
 
 if __name__ == '__main__':
-    Sqlite3Template('db/log.db').create_table('db/schema.sql')
-    rows = LogParse('logs/photock.log').data
+    # Sqlite3Template('db/log.db').create_table('db/schema.sql')
+    rows = LogParse('logs/flickr.log').data
     insert(rows)
