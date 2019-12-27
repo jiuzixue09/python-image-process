@@ -76,10 +76,10 @@ def html_create(name):
     parse_rate = [round(x, 2) for x in parse_rate]
     yaxis_pair.append(('crawl_rate', crawl_rate))
 
-    line_chart1 = create_line_chart(xaxis, yaxis_pair, title='每分钟请求')
+    line_chart1 = create_line_chart(xaxis, yaxis_pair, title='每分钟请求量')
 
     yaxis_pair = [('parse_rate', parse_rate)]
-    line_chart2 = create_line_chart(xaxis, yaxis_pair, title='每分钟解析')
+    line_chart2 = create_line_chart(xaxis, yaxis_pair, title='每分钟解析量')
 
     page = Page(layout=Page.SimplePageLayout)
     page.add(
