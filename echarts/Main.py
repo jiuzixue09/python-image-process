@@ -58,26 +58,32 @@ def html_create(name):
     bar_chart = create_bar_chart(xaxis, yaxis_pair, title='board 统计图')
 
     xaxis, yaxis_pair = [], []
-    crawl_rate = []
+    crawl_rate, parse_rate = [], []
 
     index = -1
     for r in rows:
         t = str(r.date_time)[:-3]
         if t in xaxis:
             crawl_rate[index] += r.crawl_rate
+            parse_rate[index] += (r.parse_item_count / (r.run_duration / 60))
         else:
             crawl_rate.append(r.crawl_rate)
+            parse_rate.append(r.parse_item_count / (r.run_duration / 60))
             index += 1
 
         xaxis.append(t)
     crawl_rate = [round(x, 2) for x in crawl_rate]
+    parse_rate = [round(x, 2) for x in parse_rate]
     yaxis_pair.append(('crawl_rate', crawl_rate))
 
-    line_chart = create_line_chart(xaxis, yaxis_pair, title='时序图')
+    line_chart1 = create_line_chart(xaxis, yaxis_pair, title='每分钟请求')
+
+    yaxis_pair = [('parse_rate', parse_rate)]
+    line_chart2 = create_line_chart(xaxis, yaxis_pair, title='每分钟解析')
 
     page = Page(layout=Page.SimplePageLayout)
     page.add(
-        pie_chart, bar_chart, line_chart
+        pie_chart, bar_chart, line_chart1, line_chart2
     )
 
     page.render(html.format(name=name))

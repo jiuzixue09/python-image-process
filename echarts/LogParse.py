@@ -2,6 +2,8 @@ import os
 import re
 import json
 
+import isodate
+
 
 class LogParse:
 
@@ -18,6 +20,7 @@ class LogParse:
                 board_id = re.search('board_id\\s*=\\s*([\\d]+)', line)
                 j['board_id'] = int(board_id.group(1))
                 j['data_type'] = log_file.split('/')[-1].split('.log')[0]
+                j['run_duration'] = isodate.parse_duration(j['runDuration']).seconds
                 data.append(j)
 
         self.data = data
