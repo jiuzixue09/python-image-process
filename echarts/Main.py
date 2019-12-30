@@ -63,15 +63,17 @@ def html_create(name):
     index = -1
     for r in rows:
         t = str(r.date_time)[:-3]
+        duration___ = (r.run_duration / 60.0)
+        run_duration___ = (r.parse_item_count / duration___) if duration___ > 0 else r.parse_item_count
         if t in xaxis:
             crawl_rate[index] += r.crawl_rate
-            parse_rate[index] += (r.parse_item_count / (r.run_duration / 60))
+            parse_rate[index] += run_duration___
         else:
             crawl_rate.append(r.crawl_rate)
-            parse_rate.append(r.parse_item_count / (r.run_duration / 60))
+            parse_rate.append(run_duration___)
             index += 1
+            xaxis.append(t)
 
-        xaxis.append(t)
     crawl_rate = [round(x, 2) for x in crawl_rate]
     parse_rate = [round(x, 2) for x in parse_rate]
     yaxis_pair.append(('crawl_rate', crawl_rate))

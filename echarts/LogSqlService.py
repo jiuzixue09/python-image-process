@@ -38,9 +38,9 @@ def insert(rows):
 
 def fetch(data_type) -> List[Stats]:
     db = Sqlite3Template('db/log.db')
-    # log_id = int(datetime.now().replace(minute=0, hour=0, second=0, microsecond=0).timestamp())
+    today = datetime.now().replace(minute=0, hour=0, second=0, microsecond=0)
 
-    rows = db.find_where('select * from stats where data_type = ?', data_type)
+    rows = db.find_where('select * from stats where data_type = ? and date_time > ?', data_type, today)
     db.close_db()
     results = [Stats(*row) for row in rows]
 
