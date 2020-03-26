@@ -12,7 +12,7 @@ def gif_to_sample_img(image, columns=2, rows=2):
     total_height = height << 1
     frame_size = columns * rows
 
-    if image.n_frames > frame_size:
+    if image.n_frames >= frame_size:
         frames = [all_frames[int(x)] for x in np.linspace(0, image.n_frames - 1, frame_size)]
     else:
         frames = all_frames
