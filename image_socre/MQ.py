@@ -86,7 +86,7 @@ def main():
         channel.queue_bind(exchange="direct.neptune.retrieval.aesthetic.exchange",
                            queue=queue_name, routing_key=binding_keys)
 
-        channel.basic_qos(prefetch_count=10)
+        channel.basic_qos(prefetch_count=3)
         channel.basic_consume(on_message_callback=callback, queue=queue_name)  # no_ack=True
 
         print("start consuming.")
