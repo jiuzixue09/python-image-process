@@ -3,10 +3,13 @@ from io import BytesIO
 
 from flask import Flask, request
 
-from image_socre.aesthetics import flickr_score
+from image_socre.aesthetics import Aesthetics
 from phash import HttpClientTools as http
 
 app = Flask(__name__)
+
+
+aesthetic = Aesthetics()
 
 
 @app.route('/score/bytes', methods=['POST'])
@@ -14,7 +17,7 @@ def im_byte_io_score():
     byte_array = request.data
     try:
         img = BytesIO(byte_array)
-        score = float(flickr_score(img))
+        score = float(aesthetic.aesthetic_score(img))
     except Exception as _:
         return '-1'
 
@@ -26,7 +29,7 @@ def im_base64_score():
     content = request.data
     try:
         img = BytesIO(base64.b64decode(content))
-        score = float(flickr_score(img))
+        score = float(aesthetic.aesthetic_score(img))
     except Exception as _:
         return '-1'
 
@@ -41,7 +44,7 @@ def im_url_score():
         if byte_array is None:
             return '-1'
         img = BytesIO(byte_array)
-        score = float(flickr_score(img))
+        score = float(aesthetic.aesthetic_score(img))
     except Exception as _:
         return '-1'
 
@@ -50,3 +53,4 @@ def im_url_score():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
+

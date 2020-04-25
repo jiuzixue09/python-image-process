@@ -2,9 +2,21 @@ import pika
 import json
 import datetime
 import argparse
+
 from phash import HttpClientTools as http
 from io import BytesIO
-from image_socre.aesthetics import flickr_score
+from image_socre.aesthetics import Aesthetics
+
+aesthetic = Aesthetics()
+
+EXCHANGE = "direct.neptune.retrieval.aesthetic.exchange"
+Q_NAME = "direct.neptune.retrieval.aesthetic.queue"
+R_KEY = "direct.neptune.retrieval.aesthetic.key"
+
+# callback
+CALLBACK_EXCHANGE = EXCHANGE
+CALLBACK_Q_NAME = "direct.neptune.retrieval.aesthetic.callback.queue"
+CALLBACK_KEY = "direct.neptune.retrieval.aesthetic.callback.key"
 
 
 def get_score(url):
@@ -13,7 +25,7 @@ def get_score(url):
         if byte_array is None:
             return '-1'
         img = BytesIO(byte_array)
-        score = float(flickr_score(img))
+        score = float(aesthetic.aesthetic_score(img))
         return score
     except Exception as _:
         return '-1'
@@ -32,10 +44,6 @@ def callback(ch, method, properties, body):
 
 
 def publish_message(message):
-    exchange = 'direct.neptune.retrieval.aesthetic.exchange'
-    routing_key = "direct.neptune.retrieval.aesthetic.callback.key"
-    queue_name = "direct.neptune.retrieval.aesthetic.callback.queue"
-
     user_pwd = pika.PlainCredentials(config["username"], config["password"])
 
     connection = pika.BlockingConnection(
@@ -48,14 +56,10 @@ def publish_message(message):
     )
 
     channel = connection.channel()
-    # channel.exchange_declare(exchange=exchange,
-    #                          exchange_type='direct', durable=True)
-    #
-    # channel.queue_declare(queue=queue_name, durable=True)
     print(message)
-    channel.basic_publish(exchange=exchange,
+    channel.basic_publish(exchange=CALLBACK_EXCHANGE,
                           properties=pika.BasicProperties(content_type='text'),
-                          routing_key=routing_key,
+                          routing_key=CALLBACK_KEY,
                           body=message)
     connection.close()
 
@@ -78,16 +82,10 @@ def main():
         )
 
         channel = connection.channel()
-        # channel.exchange_declare(exchange='direct.neptune.huang.exchange',
-        #                          exchange_type="direct", durable=True)
-        # result = channel.queue_declare("direct.neptune.huang.queue", durable=True)
-        queue_name = 'direct.neptune.retrieval.aesthetic.queue'
-        binding_keys = "direct.neptune.retrieval.aesthetic.key"
-        channel.queue_bind(exchange="direct.neptune.retrieval.aesthetic.exchange",
-                           queue=queue_name, routing_key=binding_keys)
+        channel.queue_bind(exchange=EXCHANGE, queue=Q_NAME, routing_key=R_KEY)
 
         channel.basic_qos(prefetch_count=3)
-        channel.basic_consume(on_message_callback=callback, queue=queue_name)  # no_ack=True
+        channel.basic_consume(on_message_callback=callback, queue=Q_NAME)
 
         print("start consuming.")
         channel.start_consuming()
@@ -97,10 +95,14 @@ def main():
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('config', nargs='?', default='dev', type=str, help="队列配置, 来自`config.json`文件, 例如: python webserivec_SR.py test")
+parser.add_argument('config', nargs='?', default='dev', type=str, help="队列配置, 来自`config.json`文件, 例如: python "
+                                                                       "webserivec_SR.py test")
 args = parser.parse_args()
 config_load = json.loads(open("config.json").read())
 config = config_load[args.config]
 
 if __name__ == '__main__':
     main()
+
+# LRU_CACHE_CAPACITY=1
+# resolve memory leak bus
