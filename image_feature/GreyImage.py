@@ -13,7 +13,7 @@ def checkGray(file, thumb_size=40, MSE_cutoff=22, adjust_color_bias=True):
         for pixel in thumb.getdata():
             mu = sum(pixel) / 3
             SSE += sum((pixel[i] - mu - bias[i]) * (pixel[i] - mu - bias[i]) for i in [0, 1, 2])  # RGB三通道和平均RGB的标准差
-        MSE = float(SSE) / (thumb_size * thumb_size)
+        MSE = float(SSE) / (thumb_size * thumb_size)  # MSE(均方差) = SSE(和方差) /n
         if MSE <= MSE_cutoff:
             return True, MSE
         else:
